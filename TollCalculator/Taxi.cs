@@ -7,6 +7,8 @@ namespace TollCalculator
     /// </summary>
     public class Taxi : Vehicle
     {
+        private int passengers;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Taxi"/> class with the specified <paramref name="baseToll"/> and <paramref name="passengers"/>.
         /// </summary>
@@ -14,7 +16,16 @@ namespace TollCalculator
         /// <param name="passengers">A passengers of this <see cref="Taxi"/> class.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="baseToll"/>less than zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="passengers"/>less than zero.</exception>
-        public Taxi(decimal baseToll, int passengers) => throw new NotImplementedException();
+        public Taxi(decimal baseToll, int passengers)
+            : base(baseToll)
+        {
+            if (passengers < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(passengers), "The passengers cannot be less than zero.");
+            }
+
+            this.Passengers = passengers;
+        }
 
         /// <summary>
         /// Gets or sets a passengers.
@@ -22,8 +33,16 @@ namespace TollCalculator
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="value"/>less than zero.</exception>
         public int Passengers
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => this.passengers;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "The number of passengers cannot be less than zero.");
+                }
+
+                this.passengers = value;
+            }
         }
 
         /// <summary>
@@ -36,6 +55,29 @@ namespace TollCalculator
         /// 3 and more              $1.00 discount.
         /// </summary>
         /// <returns>The base toll of car.</returns>
-        protected override decimal Calculate() => throw new NotImplementedException();
+        protected override decimal Calculate()
+        {
+            decimal adjustedToll = this.BaseToll;
+
+            // Determine toll adjustments based on the number of passengers
+            switch (this.Passengers)
+            {
+                case 0:
+                    adjustedToll += 0.50m;
+                    break;
+                case 2:
+                    adjustedToll -= 0.50m;
+                    break;
+                default:
+                    if (this.Passengers >= 3)
+                    {
+                        adjustedToll -= 1.00m;
+                    }
+
+                    break;
+            }
+
+            return adjustedToll;
+        }
     }
 }

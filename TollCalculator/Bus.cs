@@ -7,6 +7,9 @@ namespace TollCalculator
     /// </summary>
     public class Bus : Vehicle
     {
+        private int capacity;
+        private int passengers;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Bus"/> class with the specified the base toll, capacity and passengers.
         /// </summary>
@@ -16,7 +19,27 @@ namespace TollCalculator
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="basicToll"/>less than zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/>less than or equals zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="passengers"/>less than zero.</exception>
-        public Bus(decimal basicToll, int capacity, int passengers) => throw new NotImplementedException();
+        public Bus(decimal basicToll, int capacity, int passengers)
+            : base(basicToll)
+        {
+            if (basicToll < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(basicToll), "The toll cannot be less than zero.");
+            }
+
+            if (capacity <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(capacity), "The capacity cannot be less than or equals zero.");
+            }
+
+            if (passengers < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(passengers), "The passengers cannot be less than zero.");
+            }
+
+            this.Capacity = capacity;
+            this.Passengers = passengers;
+        }
 
         /// <summary>
         /// Gets or sets the capacity of this <see cref="Bus"/> class.
@@ -24,8 +47,16 @@ namespace TollCalculator
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="value"/>less than zero.</exception>
         public int Capacity
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => this.capacity;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "The capacity cannot be less than zero.");
+                }
+
+                this.capacity = value;
+            }
         }
 
         /// <summary>
@@ -34,8 +65,16 @@ namespace TollCalculator
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="value"/>less than zero.</exception>
         public int Passengers
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => this.passengers;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "The passengers cannot be less than zero.");
+                }
+
+                this.passengers = value;
+            }
         }
 
         /// <summary>
@@ -47,6 +86,24 @@ namespace TollCalculator
         /// more than 90%               $1.00 discount.
         /// </summary>
         /// <returns>The base toll of bus.</returns>
-        protected override decimal Calculate() => throw new NotImplementedException();
+        protected override decimal Calculate()
+        {
+            decimal adjustedToll = this.BaseToll;
+
+            // Calculate the passenger filling percentage
+            decimal fillingPercentage = (decimal)this.passengers / this.capacity;
+
+            // Check for adjustments based on passenger filling percentage
+            if (fillingPercentage < 0.5m)
+            {
+                adjustedToll += 2;
+            }
+            else if (fillingPercentage > 0.9m)
+            {
+                adjustedToll -= 1;
+            }
+
+            return adjustedToll;
+        }
     }
 }
